@@ -1,0 +1,303 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://kit.fontawesome.com/c3cdc35753.js" crossorigin="anonymous"></script>
+
+    <title>Weather App</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; /* Align content to the top of the page */
+            align-items: center;
+            background: url('sky1.jpg') center/cover no-repeat;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #ffffff;
+        }
+
+        h1 {
+            font-size: 7vw;
+            margin: 5vh 0; /* Adjust the margin as needed */
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column; /* Change to column layout */
+            width: 70%; /* Adjust the width as needed */
+            margin: 20px auto; /* Center the container with margin */
+        }
+
+        .temperature-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px; /* Add space between the buttons */
+        }
+
+        button {
+            padding: 11px;
+            background-color: #ffffff; /* Blue background */
+            color: #3498db; /* White text */
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .weather-info,
+        .weather-info-right {
+            flex: 1; /* Equal width for both containers */
+            padding: 20px;
+            margin: 10px; /* Adjust margin as needed */
+            background: rgba(255, 255, 255, 0.6); /* Adjust the transparency as needed */
+            border-radius: 10px;
+            text-align: left;
+            color: #000000; /* Adjust the color as needed (blue or light blue) */
+        }
+
+        
+
+        .weather-location,
+        .weather-location-right {
+            font-weight: bold;
+            font-size: 2.5vw !important; /* Adjust the size as needed */
+        }
+
+        .weather-info p,
+        .weather-info-right p {
+            font-size: 1.6vw; /* Adjust the size as needed */
+        }
+
+        .weather-info p:first-child {
+            margin-top: 85px; /* Decrease the margin for the first paragraph */
+        }
+
+        .weather-info p i {
+            margin-right: 5px; /* Add spacing between icon and text */
+        }
+        
+
+        .input-container {
+            margin-left: 2vw;
+            margin-top: 20px;
+             /* Center the text */
+            max-width: 100%;
+        }
+
+        input {
+            padding: 10px;
+            border: 1px solid #3498db; /* Adjust the color as needed */
+            border-radius: 10px;
+            margin-right: 10px;
+            width: 50%;
+            font-size: 15px;
+        }
+/* Add these styles for each icon class */
+
+.fa-solid.fa-cloud {
+    color: rgb(83, 83, 83); /* Change the color for the cloud icon */
+}
+
+.fas.fa-sun {
+    color: rgb(214, 214, 0); /* Change the color for the sun icon */
+}
+
+.fas.fa-cloud-showers-heavy {
+    color: rgb(65, 65, 204); /* Change the color for the rain icon */
+}
+
+.fas.fa-snowflake {
+    color: rgb(83, 83, 83); /* Change the color for the snow icon */
+}
+.fa-solid.fa-magnifying-glass-chart{
+    color: rgb(107, 107, 107);
+}
+
+.fa-solid.fa-temperature-three-quarters{
+    color: rgb(255, 103, 103);
+}
+.fa-solid.fa-droplet{
+    color: #3498db
+}
+.fa-solid.fa-wind {
+    color: rgb(83, 83, 83); /* Change the color for the other icons */
+}
+
+
+        @media (max-width: 768px) {
+    h1 {
+        font-size: 9vw; /* Adjust the font size for smaller screens */
+    }
+
+    .container {
+        width: 90%; /* Adjust the width for smaller screens */
+    }
+
+    .weather-location,
+    .weather-location-right {
+        font-size: 4.1vw !important;  /* Adjust the font size for smaller screens */
+    }
+
+    .weather-info p,
+    .weather-info-right p {
+        font-size: 3.9vw; /* Adjust the font size for smaller screens */
+    }
+
+
+    
+}
+    </style>
+</head>
+
+<body>
+    <h1 id="weatherTitle">What's The Weather?</h1>
+
+    <div class="container">
+        <div class="weather-info-right" id="weatherInfoRight">
+            <div class="input-container">
+                <input type="text" id="locationInput" placeholder="Enter Location">
+                <button onclick="getWeatherForLocation()">Get Weather</button>
+            </div>
+            <div id="customLocationInfo" class="weather-results"></div>
+        </div>
+    </div>
+
+
+
+<script>
+    
+    document.addEventListener("DOMContentLoaded", function () {
+        // Event listener for Enter key in the input field
+        const locationInput = document.getElementById('locationInput');
+        locationInput.addEventListener('keypress', function (event) {
+            if (event.key === 'Enter') {
+                getWeatherForLocation();
+            }
+        });
+        const getWeatherButton = document.querySelector('button');
+    getWeatherButton.addEventListener('click', function () {
+        getWeatherForLocation();
+    });
+
+        function success(position) {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+
+            const apiKey = '531b514d845aceb3bda35e619380a2c4';
+            const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}`;
+
+            fetchWeather(apiUrl, 'weatherInfo');
+        }
+
+        function error() {
+            alert("Unable to retrieve your location for weather information.");
+        }
+
+        function convertToCelsius(kelvin) {
+            return (kelvin - 273.15).toFixed(2);
+        }
+
+        function convertToFahrenheit(celsius) {
+            return (celsius * 9 / 5 + 32).toFixed(2);
+        }
+
+        // Inside the fetchWeather function, after getting the weather data
+        function fetchWeather(apiUrl, containerId) {
+            fetch(apiUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Failed to fetch weather data: ${response.status} ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Weather Data:', data);
+
+                    if (data && data.name && data.weather && data.weather.length > 0) {
+                        const temperatureCelsius = convertToCelsius(data.main.temp);
+                        const temperatureFahrenheit = convertToFahrenheit(temperatureCelsius);
+
+                        let weatherIconClass = '';
+                        let backgroundUrl = 'sky1.jpg'; // Default background image
+
+                        switch (data.weather[0].description.toLowerCase()) {
+                            case 'broken clouds':
+                                weatherIconClass = 'fa-solid fa-cloud';
+                                backgroundUrl = 'sky1.jpg';
+                                break;
+                            case 'mist':
+                                weatherIconClass = 'fa-solid fa-cloud';
+                                backgroundUrl = 'mist.jpg';
+                                break;
+                            case 'overcast clouds':
+                                weatherIconClass = 'fa-solid fa-cloud';
+                                backgroundUrl = 'overcast.jpg';
+                                break;
+                            case 'clear sky':
+                            case 'sunny':
+                            case 'sun':
+                                weatherIconClass = 'fas fa-sun';
+                                backgroundUrl = 'clear.jpg';
+                                break;
+                            case 'rain':
+                            case 'light rain':
+                            case 'moderate rain':
+                            case 'heavy rain':
+                            case 'light rain and snow':
+                                weatherIconClass = 'fas fa-cloud-showers-heavy';
+                                backgroundUrl = 'rain.jpg';
+                                break;
+                            case 'thunderstorm':
+                                weatherIconClass = 'fas fa-cloud-showers-heavy';
+                                backgroundUrl = 'thunderstorm.jpg';
+                                break;
+                            case 'snow':
+                            case 'light snow':
+                            case 'heavy snow':
+                                weatherIconClass = 'fas fa-snowflake';
+                                backgroundUrl = 'snowy.jpg';
+                                break;
+                            default:
+                                weatherIconClass = 'fa-solid fa-cloud'; // Default icon for unknown weather
+                                backgroundUrl = 'sky1.jpg';
+                        }
+
+                        document.body.style.background = `url('${backgroundUrl}') center/cover no-repeat`;
+
+                        const weatherContainer = document.getElementById(containerId);
+                        weatherContainer.innerHTML = `
+                            <p class="weather-location">&nbsp;&nbsp;&nbsp;Weather in ${data.name} <i class="${weatherIconClass}"></i> </p>
+                            <p>&nbsp;&nbsp;<i class="fa-solid fa-magnifying-glass-chart"></i> Description:&nbsp&nbsp;&nbsp; <strong>${data.weather[0].description}</strong></p>
+                            <p>&nbsp;&nbsp;&nbsp;<i class="fa-solid fa-temperature-three-quarters"></i> Temperature:&nbsp; <strong> ${temperatureCelsius} &deg;C / ${temperatureFahrenheit} &deg;F</strong></p>
+                            <p>&nbsp;&nbsp;&nbsp;<i class="fa-solid fa-droplet"></i> Humidity:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>${data.main.humidity}%</strong></p>
+                            <p>&nbsp;&nbsp;<i class="fa-solid fa-wind"></i> Wind Speed:&nbsp;&nbsp;<strong> ${data.wind.speed} m/s</strong></p>
+                        `;
+                    } else {
+                        throw new Error('Unexpected data structure in the response');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching weather data:', error.message);
+                });
+        }
+
+        function getWeatherForLocation() {
+            const locationInput = document.getElementById('locationInput');
+            const location = locationInput.value.trim();
+
+            if (location) {
+                const apiKey = '531b514d845aceb3bda35e619380a2c4';
+                const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${location}&appid=${apiKey}`;
+
+                fetchWeather(apiUrl, 'customLocationInfo');
+            } else {
+                alert("Please enter a location.");
+            }
+        }
+    });
+</script>
+
+    </body>
+
+</html>
