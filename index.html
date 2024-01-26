@@ -269,7 +269,7 @@
                         weatherContainer.innerHTML = `
                             <p class="weather-location">&nbsp;&nbsp;&nbsp;Weather in ${data.name} <i class="${weatherIconClass}"></i> </p>
                             <p>&nbsp;&nbsp;<i class="fa-solid fa-magnifying-glass-chart"></i> Description:&nbsp&nbsp;&nbsp; <strong>${data.weather[0].description}</strong></p>
-                            <p>&nbsp;&nbsp;&nbsp;<i class="fa-solid fa-temperature-three-quarters"></i> Temperature:&nbsp; <strong> ${temperatureCelsius} &deg;C / ${temperatureFahrenheit} &deg;F</strong></p>
+                            <p>&nbsp;&nbsp;&nbsp;<i class="fa-solid fa-temperature-three-quarters"></i> Temperature:&nbsp; <strong> ${temperatureCelsius} &deg;C/${temperatureFahrenheit} &deg;F</strong></p>
                             <p>&nbsp;&nbsp;&nbsp;<i class="fa-solid fa-droplet"></i> Humidity:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>${data.main.humidity}%</strong></p>
                             <p>&nbsp;&nbsp;<i class="fa-solid fa-wind"></i> Wind Speed:&nbsp;&nbsp;<strong> ${data.wind.speed} m/s</strong></p>
                         `;
